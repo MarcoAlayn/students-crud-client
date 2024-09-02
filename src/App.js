@@ -1,25 +1,17 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import Students from "./pages/Students";
+import Login from "./pages/Login";
+import NotFound from "./pages/NotFound";
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route path='/' element={<Login />} />
+      <Route path='/students' element={<Students />} />
+      <Route path='*' element={<NotFound />} /> {/* Ruta para manejar 404 */}
+    </Routes>
   );
-}
+};
 
 export default App;
