@@ -1,9 +1,13 @@
-import React from 'react'
+import React from "react";
+import { Container } from "@mui/material";
+import SidebarMenu from "../sidebarMenu/SidebarMenu";
 
-const Layout = () => {
+const Layout = ({ children }) => {
   return (
-    <div>Layout</div>
-  )
-}
+    <Container>
+      <SidebarMenu children={children} />
+    </Container>
+  );
+};
 
-export default Layout
+export default Layout;

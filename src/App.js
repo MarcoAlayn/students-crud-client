@@ -7,8 +7,8 @@ import NotFound from "./pages/NotFound";
 const App = () => {
   return (
     <Routes>
-      <Route path='/' element={<Login />} />
-      <Route path='/students' element={<Students />} />
+      <Route path='/login' element={<Login />} />
+      <Route path='/' element={<Students />} />
       <Route path='*' element={<NotFound />} /> {/* Ruta para manejar 404 */}
     </Routes>
   );
