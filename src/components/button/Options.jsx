@@ -5,7 +5,9 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import EditIcon from "@mui/icons-material/Edit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import { useDispatch, useSelector } from "react-redux";
+import { getStudentById, openModalEdit } from "../../redux/actions";
 
 const StyledMenu = styled(Menu)(({ theme }) => ({
   "& .MuiPaper-root": {
@@ -28,7 +30,9 @@ const StyledMenu = styled(Menu)(({ theme }) => ({
   },
 }));
 
-export default function IconBtn() {
+export default function Options({ id }) {
+  const { isFetchSuccess } = useSelector((state) => state);
+  const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -37,6 +41,14 @@ export default function IconBtn() {
   };
 
   const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleOpenModalEdit = () => {
+    dispatch(getStudentById(id));
+    if (isFetchSuccess) {
+      dispatch(openModalEdit(true));
+    }
     setAnchorEl(null);
   };
 
@@ -58,10 +70,12 @@ export default function IconBtn() {
           horizontal: "center",
         }}
       >
-        <MenuItem onClick={handleClose} disableRipple>
+        {/* edit */}
+        <MenuItem onClick={handleOpenModalEdit} disableRipple>
           <EditIcon />
           Editar
         </MenuItem>
+        {/* delete */}
         <MenuItem onClick={handleClose} disableRipple>
           <DeleteForeverIcon />
           Eliminar
