@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import Layout from "../components/layout/Layout";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllStudents } from "../redux/actions";
+import { getAllStudents, getStudentById } from "../redux/actions";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -9,16 +9,23 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import IconBtn from "../components/button/IconBtn";
+import Options from "../components/button/Options";
 import Loader from "../components/Loader/Loader";
 import AlertFeedback from "../components/alertFeedback/AlertFeedback";
 import Text from "../components/text/Text";
 import { Box } from "@mui/material";
+import ModalForm from "../components/modalForm/ModalForm";
 
 const Students = () => {
   const dispatch = useDispatch();
-  const { studentList, fetchInProcess, isFetchSuccess, fetchMessage } =
-    useSelector((state) => state);
+  const {
+    fetchInProcess,
+    isFetchSuccess,
+    fetchMessage,
+    studentList,
+    studentSected,
+  } = useSelector((state) => state);
+
   // const studentList = [
   //   {
   //     studentId: 2,
@@ -205,14 +212,17 @@ const Students = () => {
 
   useEffect(() => {
     dispatch(getAllStudents());
+    // dispatch(getStudentById(10));
   }, [dispatch]);
-  console.log(fetchMessage !== null);
+  console.log(studentSected);
   return (
     <Layout>
       {/* loader */}
       <Loader />
       {/* alert */}
       <AlertFeedback />
+      {/* modalForm */}
+      <ModalForm />
       {/* Tabla */}
       {!fetchInProcess && isFetchSuccess && studentList.length > 0 ? (
         <TableContainer component={Paper}>
@@ -229,9 +239,7 @@ const Students = () => {
             </TableHead>
             <TableBody>
               {studentList.map((row) => (
-                <TableRow
-                  key={row.studentId}
-                >
+                <TableRow key={row.studentId}>
                   <TableCell align='left'>{row.studentId}</TableCell>
                   <TableCell align='left'>
                     {row.firstName} {row.middleName} {row.lastName}
@@ -242,7 +250,7 @@ const Students = () => {
                     {row.studentCreatedOn.slice(0, 10)}
                   </TableCell>
                   <TableCell align='left'>
-                    <IconBtn />
+                    <Options id={row.studentId} />
                   </TableCell>
                 </TableRow>
               ))}
