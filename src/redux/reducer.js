@@ -1,25 +1,25 @@
-// 1. Importamos nuestras acciones
 import {
   GET_ALL_STUDENTS,
   FETCH_REQUEST,
   FETCH_SUCCESS,
   FETCH_FAILURE,
   GET_STUDENT_BY_ID,
-  OPEN_MODAL_EDIT,
+  SHOW_MODAL_DETAIL,
+  RESET_STUDENT_INFO,
+  SET_MODAL_MODE,
+  UPDATE_STUDENT
 } from "./actions";
 
-// 2. Define el estado inicial del reducer
 const initialState = {
   studentList: [],
-  studentSected: [],
+  studentSelected: [],
   fetchInProcess: false,
   isFetchSuccess: false,
   fetchMessage: null,
-  openModalEdit: false,
-  openModalCreate: false,
+  showModalDetail: false,
+  modalMode: null,
 };
 
-// 3. Define el reducer
 export function rootReducer(state = initialState, action) {
   switch (action.type) {
     case FETCH_REQUEST:
@@ -51,14 +51,27 @@ export function rootReducer(state = initialState, action) {
     case GET_STUDENT_BY_ID:
       return {
         ...state,
-        studentSected: action.payload,
+        studentSelected: action.payload,
       };
-    case OPEN_MODAL_EDIT:
+    case SHOW_MODAL_DETAIL:
       return {
         ...state,
-        openModalEdit: action.payload,
+        showModalDetail: action.payload,
       };
-
+    case RESET_STUDENT_INFO:
+      return {
+        ...state,
+        studentSelected: [],
+      };
+    case SET_MODAL_MODE:
+      return {
+        ...state,
+        modalMode: action.payload,
+      };
+    case UPDATE_STUDENT:
+      return {
+        ...state,
+      };
     default:
       return state;
   }
