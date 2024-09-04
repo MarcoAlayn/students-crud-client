@@ -13,6 +13,7 @@ import {
   IconButton,
   Typography,
   Divider,
+  Button,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -22,14 +23,22 @@ import HomeIcon from "@mui/icons-material/Home";
 import { Link } from "react-router-dom";
 import Text from "../text/Text";
 import colors from "../../utils/colors";
+import { showModalDetail, setModalMode } from "../../redux/actions";
+import { useDispatch } from "react-redux";
 
 const drawerWidth = 240;
 
 export default function SidebarMenu({ children }) {
   const [open, setOpen] = React.useState(false);
+  const dispatch = useDispatch();
 
   const handleDrawerToggle = () => {
     setOpen(!open);
+  };
+
+  const handlerModalCreate = () => {
+    dispatch(showModalDetail(true));
+    dispatch(setModalMode("create"));
   };
 
   return (
@@ -55,7 +64,7 @@ export default function SidebarMenu({ children }) {
           }),
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           <IconButton
             color='inherit'
             aria-label='open drawer'
@@ -65,9 +74,18 @@ export default function SidebarMenu({ children }) {
           >
             <MenuIcon />
           </IconButton>
+
           <Typography variant='h6' noWrap>
             ERP Escolar
           </Typography>
+
+          <Button
+            onClick={handlerModalCreate}
+            variant='contained'
+            endIcon={<SchoolIcon />}
+          >
+            Crear
+          </Button>
         </Toolbar>
       </AppBar>
       <Drawer

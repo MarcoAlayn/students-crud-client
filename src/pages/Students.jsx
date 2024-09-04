@@ -35,7 +35,7 @@ const Students = () => {
       {/* loader */}
       <Loader />
       {/* alert */}
-      <AlertFeedback />
+      {!fetchInProcess && <AlertFeedback />}
       {/* modalForm */}
       {!fetchInProcess && showModalDetail && <ModalForm />}
       {/* Tabla */}

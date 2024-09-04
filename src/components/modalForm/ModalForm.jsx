@@ -13,13 +13,18 @@ import {
   showModalDetail as toggleModalDetail,
   resetStudentInfo,
   updateStudent,
+  createStudent
 } from "../../redux/actions";
 
 export default function ModalForm() {
   const dispatch = useDispatch();
-  const { showModalDetail, studentSelected, modalMode } = useSelector(
-    (state) => state
-  );
+  const {
+    showModalDetail,
+    studentSelected,
+    modalMode,
+    isFetchSuccess,
+    fetchMessage,
+  } = useSelector((state) => state);
 
   const {
     handleSubmit,
@@ -28,21 +33,25 @@ export default function ModalForm() {
     reset,
   } = useForm();
 
-  const handleClose = () => {
-    if(!isDirty && !isFetchSuccess) return
-    dispatch(toggleModalDetail(false));
-    dispatch(resetStudentInfo());
-  };
-
-  const onSubmit = (data) => {
-    dispatch(updateStudent(studentSelected?.studentId, data));
-    handleClose();
-  };
-
-  let textFieldStyle = modalMode === "read" ? "standard" : "outlined";
-
   useEffect(() => {
-    if (studentSelected) {
+    if (modalMode === "create") {
+      reset({
+        firstName: "",
+        middleName: "",
+        lastName: "",
+        gender: "",
+        addressLine: "",
+        city: "",
+        zipPostcode: "",
+        state: "",
+        email: "",
+        emailType: "",
+        phone: "",
+        phoneType: "",
+        countryCode: "",
+        areaCode: "",
+      });
+    } else if (modalMode === "edit" || modalMode === "read") {
       reset({
         firstName: studentSelected?.firstName,
         middleName: studentSelected?.middleName,
@@ -60,7 +69,23 @@ export default function ModalForm() {
         areaCode: studentSelected?.areaCode,
       });
     }
-  }, [studentSelected, reset]);
+  }, [studentSelected, reset, modalMode]);
+
+  const onSubmit = (data) => {
+    if (modalMode === "create") {
+      dispatch(createStudent(data)); // Usar la acción para crear un nuevo estudiante
+    } else if (modalMode === "edit") {
+      dispatch(updateStudent(studentSelected?.studentId, data));
+    }
+    handleClose();
+  };
+
+  const handleClose = () => {
+    dispatch(toggleModalDetail(false));
+    dispatch(resetStudentInfo());
+  };
+
+  let textFieldStyle = modalMode === "read" ? "standard" : "outlined";
 
   return (
     <Dialog

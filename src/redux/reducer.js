@@ -1,13 +1,15 @@
 import {
-  GET_ALL_STUDENTS,
   FETCH_REQUEST,
   FETCH_SUCCESS,
   FETCH_FAILURE,
+  GET_ALL_STUDENTS,
   GET_STUDENT_BY_ID,
   SHOW_MODAL_DETAIL,
   RESET_STUDENT_INFO,
   SET_MODAL_MODE,
-  UPDATE_STUDENT
+  UPDATE_STUDENT,
+  CREATE_STUDENT,
+  DELETE_STUDENT,
 } from "./actions";
 
 const initialState = {
@@ -72,6 +74,15 @@ export function rootReducer(state = initialState, action) {
       return {
         ...state,
       };
+    case CREATE_STUDENT:
+      return {
+        ...state,
+      };
+    case DELETE_STUDENT: {
+      return {
+        ...state,
+      };
+    }
     default:
       return state;
   }
