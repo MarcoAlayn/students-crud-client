@@ -7,12 +7,18 @@ import EditIcon from "@mui/icons-material/Edit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Button from "@mui/material/Button";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getStudentById,
   showModalDetail,
   setModalMode,
   deleteStudent,
+  getAllStudents,
 } from "../../redux/actions";
 
 const StyledMenu = styled(Menu)(({ theme }) => ({
@@ -38,6 +44,7 @@ const StyledMenu = styled(Menu)(({ theme }) => ({
 
 export default function Options({ id }) {
   const { isFetchSuccess } = useSelector((state) => state);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -68,10 +75,25 @@ export default function Options({ id }) {
     setAnchorEl(null);
   };
 
-  const handleOpenModalDelete = () => {
-    dispatch(deleteStudent(id));
+  const handleOpenConfirmationModal = () => {
+    setShowConfirmationModal(true);
     setAnchorEl(null);
   };
+
+  const handleCloseConfirmationModal = () => {
+    setShowConfirmationModal(false);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await dispatch(deleteStudent(id));
+      dispatch(getAllStudents());
+    } catch (error) {
+      console.error("Error al eliminar el estudiante:", error);
+    }
+    setShowConfirmationModal(false);
+  };
+  
 
   return (
     <div>
@@ -102,11 +124,28 @@ export default function Options({ id }) {
           Editar
         </MenuItem>
         {/* delete */}
-        <MenuItem onClick={handleOpenModalDelete} disableRipple>
+        <MenuItem onClick={handleOpenConfirmationModal} disableRipple>
           <DeleteForeverIcon />
           Eliminar
         </MenuItem>
       </StyledMenu>
+      {/* Confirmation Modal */}
+      <Dialog
+        open={showConfirmationModal}
+        onClose={handleCloseConfirmationModal}
+      >
+        <DialogTitle>¿Estás seguro?</DialogTitle>
+        <DialogContent>
+          ¿Realmente deseas eliminar este elemento? Esta acción no se puede
+          deshacer.
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseConfirmationModal}>Cancelar</Button>
+          <Button onClick={handleDelete} color='primary'>
+            Confirmar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

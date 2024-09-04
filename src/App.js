@@ -9,7 +9,7 @@ const App = () => {
     <Routes>
       <Route path='/login' element={<Login />} />
       <Route path='/' element={<Students />} />
-      <Route path='*' element={<NotFound />} /> {/* Ruta para manejar 404 */}
+      <Route path='*' element={<NotFound />} />
     </Routes>
   );
 };
