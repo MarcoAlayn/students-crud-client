@@ -12,6 +12,7 @@ import {
   getStudentById,
   showModalDetail,
   setModalMode,
+  deleteStudent,
 } from "../../redux/actions";
 
 const StyledMenu = styled(Menu)(({ theme }) => ({
@@ -68,10 +69,7 @@ export default function Options({ id }) {
   };
 
   const handleOpenModalDelete = () => {
-    // dispatch(getStudentById(id));
-    // if (isFetchSuccess) {
-    //   dispatch(showModalDetail(true));
-    // }
+    dispatch(deleteStudent(id));
     setAnchorEl(null);
   };
 
