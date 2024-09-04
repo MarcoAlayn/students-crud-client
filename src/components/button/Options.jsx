@@ -6,9 +6,13 @@ import MenuItem from "@mui/material/MenuItem";
 import EditIcon from "@mui/icons-material/Edit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useDispatch, useSelector } from "react-redux";
-import { getStudentById, showModalDetail, setModalMode } from "../../redux/actions";
+import {
+  getStudentById,
+  showModalDetail,
+  setModalMode,
+} from "../../redux/actions";
 
 const StyledMenu = styled(Menu)(({ theme }) => ({
   "& .MuiPaper-root": {
@@ -46,14 +50,14 @@ export default function Options({ id }) {
   };
 
   const handleOpenModalRead = () => {
-    
+    dispatch(getStudentById(id));
     if (isFetchSuccess) {
       dispatch(showModalDetail(true));
       dispatch(setModalMode("read"));
     }
     setAnchorEl(null);
   };
-  
+
   const handleOpenModalEdit = () => {
     dispatch(getStudentById(id));
     if (isFetchSuccess) {
@@ -100,7 +104,7 @@ export default function Options({ id }) {
           Editar
         </MenuItem>
         {/* delete */}
-        <MenuItem onClick={handleOpenModalDelet} disableRipple>
+        <MenuItem onClick={handleOpenModalDelete} disableRipple>
           <DeleteForeverIcon />
           Eliminar
         </MenuItem>
