@@ -12,11 +12,13 @@ export const CREATE_STUDENT = "CREATE_STUDENT";
 export const DELETE_STUDENT = "DELETE_STUDENT";
 export const RESET_STUDENT_INFO = "RESET_STUDENT_INFO";
 
+const apiURL = "https://nice-sand-0d8b39c1e.5.azurestaticapps.net"
+
 export const getAllStudents = () => {
   return async (dispatch) => {
     dispatch({ type: FETCH_REQUEST });
     try {
-      const response = await axios.get("https://localhost:7191/api/Student");
+      const response = await axios.get(`${apiURL}/api/Student`);
 
       if (response?.status >= 200 && response?.status < 300) {
         dispatch({
@@ -48,7 +50,7 @@ export const getStudentById = (id) => {
     dispatch({ type: FETCH_REQUEST });
     try {
       const response = await axios.get(
-        `https://localhost:7191/api/Student/${id}`
+        `${apiURL}/api/Student/${id}`
       );
 
       if (response?.status >= 200 && response?.status < 300) {
@@ -82,7 +84,7 @@ export const updateStudent = (id, data) => {
 
     try {
       const response = await axios.put(
-        `https://localhost:7191/api/Student/${id}`,
+        `${apiURL}/api/Student/${id}`,
         data
       );
       if (response?.status >= 200 && response?.status < 300) {
@@ -114,7 +116,7 @@ export const createStudent = (data) => {
     dispatch({ type: FETCH_REQUEST });
     try {
       const response = await axios.post(
-        "https://localhost:7191/api/Student",
+        `${apiURL}/api/Student`,
         data
       );
       if (response?.status >= 200 && response?.status < 300) {
@@ -146,7 +148,7 @@ export const deleteStudent = (id) => {
     dispatch({ type: FETCH_REQUEST });
     try {
       const response = await axios.delete(
-        `https://localhost:7191/api/Student/${id}`
+        `${apiURL}/api/Student/${id}`
       );
 
       if (response?.status >= 200 && response?.status < 300) {
