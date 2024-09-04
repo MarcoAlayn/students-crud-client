@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -9,49 +9,73 @@ import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import MenuItem from "@mui/material/MenuItem";
 import { useForm, Controller } from "react-hook-form";
-import { openModalEdit as handleModalEdit } from "../../redux/actions";
+import {
+  showModalDetail as toggleModalDetail,
+  resetStudentInfo,
+  updateStudent,
+} from "../../redux/actions";
 
 export default function ModalForm() {
   const dispatch = useDispatch();
-  const { openModalEdit } = useSelector((state) => state);
+  const { showModalDetail, studentSelected, modalMode } = useSelector(
+    (state) => state
+  );
 
   const {
     handleSubmit,
     control,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      nombre: "Ana",
-      segundoNombre: "Carolina",
-      apellido: "Vázquez",
-      genero: "F",
-      direccion: "Calle Obregón 345",
-      ciudad: "Cajeme",
-      codigoPostal: "85000",
-      estado: "Sonora",
-      correoElectronico: "ana.vazquez@example.com",
-      tipoCorreo: "Personal",
-      telefono: "6441234567",
-      tipoTelefono: "Personal",
-      codigoPais: "52",
-      codigoArea: "644",
-    },
-  });
+    formState: { errors, isDirty },
+    reset,
+  } = useForm();
 
   const handleClose = () => {
-    dispatch(handleModalEdit(false));
+    if(!isDirty && !isFetchSuccess) return
+    dispatch(toggleModalDetail(false));
+    dispatch(resetStudentInfo());
   };
 
   const onSubmit = (data) => {
-    console.log(data);
-    // Aquí manejas la lógica para guardar los cambios
-    // dispatch(saveStudentInfo(data));
+    dispatch(updateStudent(studentSelected?.studentId, data));
     handleClose();
   };
 
+  let textFieldStyle = modalMode === "read" ? "standard" : "outlined";
+
+  useEffect(() => {
+    if (studentSelected) {
+      reset({
+        firstName: studentSelected?.firstName,
+        middleName: studentSelected?.middleName,
+        lastName: studentSelected?.lastName,
+        gender: studentSelected?.gender,
+        addressLine: studentSelected?.addressLine,
+        city: studentSelected?.city,
+        zipPostcode: studentSelected?.zipPostcode,
+        state: studentSelected?.state,
+        email: studentSelected?.email,
+        emailType: studentSelected?.emailType,
+        phone: studentSelected?.phone,
+        phoneType: studentSelected?.phoneType,
+        countryCode: studentSelected?.countryCode,
+        areaCode: studentSelected?.areaCode,
+      });
+    }
+  }, [studentSelected, reset]);
+
   return (
-    <Dialog open={openModalEdit} onClose={handleClose} fullWidth maxWidth='md'>
-      <DialogTitle>Editar Información del Estudiante</DialogTitle>
+    <Dialog
+      open={showModalDetail}
+      onClose={handleClose}
+      fullWidth
+      maxWidth='md'
+    >
+      <DialogTitle>
+        {modalMode === "create"
+          ? "Crear Nuevo Estudiante"
+          : modalMode === "edit"
+          ? "Editar Información del Estudiante"
+          : "Ver Información del Estudiante"}
+      </DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent>
           <Box
@@ -73,41 +97,41 @@ export default function ModalForm() {
             >
               {/* FirstName */}
               <Controller
-                name='firstName' // Nombre del campo que se utilizará para manejar este input
-                control={control} // Control provisto por React Hook Form para manejar este campo
-                defaultValue='' // Valor por defecto para este campo
+                name='firstName'
+                control={control}
+                defaultValue=''
                 rules={{
-                  // Reglas de validación aplicadas al campo
-                  required: "Campo obligatorio", // El campo es obligatorio
+                  required: "Campo obligatorio",
                   minLength: {
-                    value: 2, // Mínimo de caracteres permitidos
-                    message: "Mínimo 2 caracteres", // Mensaje de error si no se cumple la regla
+                    value: 2,
+                    message: "Mínimo 2 caracteres",
                   },
                   maxLength: {
-                    value: 10, // Máximo de caracteres permitidos
-                    message: "Máximo 10 caracteres", // Mensaje de error si no se cumple la regla
+                    value: 10,
+                    message: "Máximo 10 caracteres",
                   },
                   pattern: {
-                    // Expresión regular para validar que solo se ingresen letras
                     value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/,
-                    message: "Solo letras", // Mensaje de error si no se cumple la regla
+                    message: "Solo letras",
                   },
                 }}
-                render={(
-                  { field } // Función para renderizar el componente de entrada
-                ) => (
+                render={({ field }) => (
                   <TextField
-                    {...field} // Propiedades del campo manejadas por React Hook Form
-                    label='Nombre' // Etiqueta del campo en el formulario
-                    variant='outlined' // Estilo del TextField (de Material UI)
+                    {...field}
+                    label='Nombre'
+                    variant={textFieldStyle}
                     required
-                    error={!!errors.firstName} // Muestra error si existe
+                    error={!!errors.firstName}
                     helperText={
                       errors.firstName ? errors.firstName.message : ""
-                    } // Mensaje de error si existe, o vacío
-                    // Margen del campo
+                    }
                     size='small'
                     sx={{ minWidth: "20%" }}
+                    slotProps={{
+                      input: {
+                        readOnly: modalMode === "read",
+                      },
+                    }}
                   />
                 )}
               />
@@ -120,24 +144,23 @@ export default function ModalForm() {
                 rules={{
                   required: "Campo obligatorio",
                   minLength: {
-                    value: 2, // Mínimo de caracteres permitidos
-                    message: "Mínimo 2 caracteres", // Mensaje de error si no se cumple la regla
+                    value: 2,
+                    message: "Mínimo 2 caracteres",
                   },
                   maxLength: {
-                    value: 10, // Máximo de caracteres permitidos
-                    message: "Máximo 10 caracteres", // Mensaje de error si no se cumple la regla
+                    value: 10,
+                    message: "Máximo 10 caracteres",
                   },
                   pattern: {
-                    // Expresión regular para validar que solo se ingresen letras
                     value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/,
-                    message: "Solo letras", // Mensaje de error si no se cumple la regla
+                    message: "Solo letras",
                   },
                 }}
                 render={({ field }) => (
                   <TextField
                     {...field}
                     label='Segundo Nombre'
-                    variant='outlined'
+                    variant={textFieldStyle}
                     required
                     error={!!errors.middleName}
                     helperText={
@@ -145,6 +168,11 @@ export default function ModalForm() {
                     }
                     size='small'
                     sx={{ minWidth: "20%" }}
+                    slotProps={{
+                      input: {
+                        readOnly: modalMode === "read",
+                      },
+                    }}
                   />
                 )}
               />
@@ -157,29 +185,33 @@ export default function ModalForm() {
                 rules={{
                   required: "Campo obligatorio",
                   minLength: {
-                    value: 2, // Mínimo de caracteres permitidos
-                    message: "Mínimo 2 caracteres", // Mensaje de error si no se cumple la regla
+                    value: 2,
+                    message: "Mínimo 2 caracteres",
                   },
                   maxLength: {
-                    value: 10, // Máximo de caracteres permitidos
-                    message: "Máximo 10 caracteres", // Mensaje de error si no se cumple la regla
+                    value: 10,
+                    message: "Máximo 10 caracteres",
                   },
                   pattern: {
-                    // Expresión regular para validar que solo se ingresen letras
                     value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/,
-                    message: "Solo letras", // Mensaje de error si no se cumple la regla
+                    message: "Solo letras",
                   },
                 }}
                 render={({ field }) => (
                   <TextField
                     {...field}
                     label='apellido'
-                    variant='outlined'
+                    variant={textFieldStyle}
                     required
                     error={!!errors.lastName}
                     helperText={errors.lastName ? errors.lastName.message : ""}
                     size='small'
                     sx={{ minWidth: "20%" }}
+                    slotProps={{
+                      input: {
+                        readOnly: modalMode === "read",
+                      },
+                    }}
                   />
                 )}
               />
@@ -197,11 +229,16 @@ export default function ModalForm() {
                     {...field}
                     select
                     label='Género'
-                    variant='outlined'
+                    variant={textFieldStyle}
                     required
                     fullWidth
                     size='small'
                     sx={{ minWidth: "20%" }}
+                    slotProps={{
+                      input: {
+                        readOnly: modalMode === "read",
+                      },
+                    }}
                   >
                     {[
                       { label: "Masculino", value: "M" },
@@ -231,11 +268,11 @@ export default function ModalForm() {
                 rules={{
                   required: "Campo obligatorio",
                   minLength: {
-                    value: 5, // Mínimo de caracteres permitidos
+                    value: 5,
                     message: "Mínimo 5 caracteres",
                   },
                   maxLength: {
-                    value: 50, // Máximo de caracteres permitidos
+                    value: 50,
                     message: "Máximo 50 caracteres",
                   },
                 }}
@@ -243,7 +280,7 @@ export default function ModalForm() {
                   <TextField
                     {...field}
                     label='Dirección'
-                    variant='outlined'
+                    variant={textFieldStyle}
                     required
                     error={!!errors.addressLine}
                     helperText={
@@ -252,6 +289,11 @@ export default function ModalForm() {
                     fullWidth
                     size='small'
                     sx={{ minWidth: "20%" }}
+                    slotProps={{
+                      input: {
+                        readOnly: modalMode === "read",
+                      },
+                    }}
                   />
                 )}
               />
@@ -264,15 +306,15 @@ export default function ModalForm() {
                 rules={{
                   required: "Campo obligatorio",
                   minLength: {
-                    value: 2, // Mínimo de caracteres permitidos
+                    value: 2,
                     message: "Mínimo 2 caracteres",
                   },
                   maxLength: {
-                    value: 30, // Máximo de caracteres permitidos
+                    value: 30,
                     message: "Máximo 30 caracteres",
                   },
                   pattern: {
-                    value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/, // Letras y espacios
+                    value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
                     message: "Solo letras y espacios",
                   },
                 }}
@@ -280,13 +322,18 @@ export default function ModalForm() {
                   <TextField
                     {...field}
                     label='Ciudad'
-                    variant='outlined'
+                    variant={textFieldStyle}
                     required
                     error={!!errors.city}
                     helperText={errors.city ? errors.city.message : ""}
                     fullWidth
                     size='small'
                     sx={{ minWidth: "20%" }}
+                    slotProps={{
+                      input: {
+                        readOnly: modalMode === "read",
+                      },
+                    }}
                   />
                 )}
               />
@@ -299,15 +346,15 @@ export default function ModalForm() {
                 rules={{
                   required: "Campo obligatorio",
                   minLength: {
-                    value: 5, // Mínimo de caracteres permitidos
+                    value: 5,
                     message: "Mínimo 5 caracteres",
                   },
                   maxLength: {
-                    value: 10, // Máximo de caracteres permitidos
+                    value: 10,
                     message: "Máximo 10 caracteres",
                   },
                   pattern: {
-                    value: /^[0-9]+$/, // Solo números
+                    value: /^[0-9]+$/,
                     message: "Solo números",
                   },
                 }}
@@ -315,7 +362,8 @@ export default function ModalForm() {
                   <TextField
                     {...field}
                     label='Código Postal'
-                    variant='outlined'
+                    variant={textFieldStyle}
+                    type='number'
                     required
                     error={!!errors.zipPostcode}
                     helperText={
@@ -324,6 +372,11 @@ export default function ModalForm() {
                     fullWidth
                     size='small'
                     sx={{ minWidth: "20%" }}
+                    slotProps={{
+                      input: {
+                        readOnly: modalMode === "read",
+                      },
+                    }}
                   />
                 )}
               />
@@ -336,15 +389,15 @@ export default function ModalForm() {
                 rules={{
                   required: "Campo obligatorio",
                   minLength: {
-                    value: 2, // Mínimo de caracteres permitidos
+                    value: 2,
                     message: "Mínimo 2 caracteres",
                   },
                   maxLength: {
-                    value: 30, // Máximo de caracteres permitidos
+                    value: 30,
                     message: "Máximo 30 caracteres",
                   },
                   pattern: {
-                    value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/, // Letras y espacios
+                    value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
                     message: "Solo letras y espacios",
                   },
                 }}
@@ -352,13 +405,18 @@ export default function ModalForm() {
                   <TextField
                     {...field}
                     label='Estado'
-                    variant='outlined'
+                    variant={textFieldStyle}
                     required
                     error={!!errors.state}
                     helperText={errors.state ? errors.state.message : ""}
                     fullWidth
                     size='small'
                     sx={{ minWidth: "20%" }}
+                    slotProps={{
+                      input: {
+                        readOnly: modalMode === "read",
+                      },
+                    }}
                   />
                 )}
               />
@@ -380,7 +438,7 @@ export default function ModalForm() {
                 rules={{
                   required: "Campo obligatorio",
                   pattern: {
-                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, // Validación de email
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
                     message: "Debe ser un email válido",
                   },
                 }}
@@ -388,13 +446,19 @@ export default function ModalForm() {
                   <TextField
                     {...field}
                     label='Email'
-                    variant='outlined'
+                    variant={textFieldStyle}
+                    type='email'
                     required
                     error={!!errors.email}
                     helperText={errors.email ? errors.email.message : ""}
                     fullWidth
                     size='small'
                     sx={{ minWidth: "20%" }}
+                    slotProps={{
+                      input: {
+                        readOnly: modalMode === "read",
+                      },
+                    }}
                   />
                 )}
               />
@@ -412,7 +476,7 @@ export default function ModalForm() {
                     {...field}
                     select
                     label='Tipo de Correo'
-                    variant='outlined'
+                    variant={textFieldStyle}
                     fullWidth
                     required
                     error={!!errors.emailType}
@@ -421,6 +485,11 @@ export default function ModalForm() {
                     }
                     size='small'
                     sx={{ minWidth: "20%" }}
+                    slotProps={{
+                      input: {
+                        readOnly: modalMode === "read",
+                      },
+                    }}
                   >
                     {[
                       { label: "Personal", value: "Personal" },
@@ -443,15 +512,15 @@ export default function ModalForm() {
                 rules={{
                   required: "Campo obligatorio",
                   minLength: {
-                    value: 10, // Mínimo de caracteres permitidos
+                    value: 10,
                     message: "Mínimo 10 dígitos",
                   },
                   maxLength: {
-                    value: 15, // Máximo de caracteres permitidos
+                    value: 15,
                     message: "Máximo 15 dígitos",
                   },
                   pattern: {
-                    value: /^[0-9]+$/, // Solo números
+                    value: /^[0-9]+$/,
                     message: "Solo números",
                   },
                 }}
@@ -459,13 +528,19 @@ export default function ModalForm() {
                   <TextField
                     {...field}
                     label='Teléfono'
-                    variant='outlined'
+                    variant={textFieldStyle}
+                    type='tel'
                     required
                     error={!!errors.phone}
                     helperText={errors.phone ? errors.phone.message : ""}
                     fullWidth
                     size='small'
                     sx={{ minWidth: "20%" }}
+                    slotProps={{
+                      input: {
+                        readOnly: modalMode === "read",
+                      },
+                    }}
                   />
                 )}
               />
@@ -483,11 +558,16 @@ export default function ModalForm() {
                     {...field}
                     select
                     label='Tipo de Teléfono'
-                    variant='outlined'
+                    variant={textFieldStyle}
                     fullWidth
                     required
                     size='small'
                     sx={{ minWidth: "20%" }}
+                    slotProps={{
+                      input: {
+                        readOnly: modalMode === "read",
+                      },
+                    }}
                   >
                     {[
                       { label: "Personal", value: "Personal" },
@@ -518,15 +598,15 @@ export default function ModalForm() {
                 rules={{
                   required: "Campo obligatorio",
                   minLength: {
-                    value: 1, // Mínimo de caracteres permitidos
+                    value: 1,
                     message: "Mínimo 1 dígito",
                   },
                   maxLength: {
-                    value: 3, // Máximo de caracteres permitidos
+                    value: 3,
                     message: "Máximo 3 dígitos",
                   },
                   pattern: {
-                    value: /^[0-9]+$/, // Solo números
+                    value: /^[0-9]+$/,
                     message: "Solo números",
                   },
                 }}
@@ -534,15 +614,21 @@ export default function ModalForm() {
                   <TextField
                     {...field}
                     label='Código de País'
-                    variant='outlined'
+                    variant={textFieldStyle}
+                    type='number'
                     required
                     error={!!errors.countryCode}
                     helperText={
                       errors.countryCode ? errors.countryCode.message : ""
                     }
                     fullWidth
-                    size='small' // Cambia el tamaño del input a pequeño
+                    size='small'
                     sx={{ minWidth: "20%" }}
+                    slotProps={{
+                      input: {
+                        readOnly: modalMode === "read",
+                      },
+                    }}
                   />
                 )}
               />
@@ -555,15 +641,15 @@ export default function ModalForm() {
                 rules={{
                   required: "Campo obligatorio",
                   minLength: {
-                    value: 1, // Mínimo de caracteres permitidos
+                    value: 1,
                     message: "Mínimo 1 dígito",
                   },
                   maxLength: {
-                    value: 5, // Máximo de caracteres permitidos
+                    value: 5,
                     message: "Máximo 5 dígitos",
                   },
                   pattern: {
-                    value: /^[0-9]+$/, // Solo números
+                    value: /^[0-9]+$/,
                     message: "Solo números",
                   },
                 }}
@@ -571,13 +657,19 @@ export default function ModalForm() {
                   <TextField
                     {...field}
                     label='Código de Área'
-                    variant='outlined'
+                    variant={textFieldStyle}
+                    type='number'
                     required
                     error={!!errors.areaCode}
                     helperText={errors.areaCode ? errors.areaCode.message : ""}
                     fullWidth
                     size='small'
                     sx={{ minWidth: "20%" }}
+                    slotProps={{
+                      input: {
+                        readOnly: modalMode === "read",
+                      },
+                    }}
                   />
                 )}
               />
@@ -586,11 +678,13 @@ export default function ModalForm() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color='secondary'>
-            Cancelar
+            {modalMode === "read" ? "Cerrar" : "Cancelar"}
           </Button>
-          <Button type='submit' color='primary'>
-            Guardar
-          </Button>
+          {modalMode !== "read" && (
+            <Button type='submit' color='primary' disabled={!isDirty}>
+              Actualizar
+            </Button>
+          )}
         </DialogActions>
       </form>
     </Dialog>

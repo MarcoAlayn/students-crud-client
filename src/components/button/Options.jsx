@@ -6,8 +6,9 @@ import MenuItem from "@mui/material/MenuItem";
 import EditIcon from "@mui/icons-material/Edit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useDispatch, useSelector } from "react-redux";
-import { getStudentById, openModalEdit } from "../../redux/actions";
+import { getStudentById, showModalDetail, setModalMode } from "../../redux/actions";
 
 const StyledMenu = styled(Menu)(({ theme }) => ({
   "& .MuiPaper-root": {
@@ -44,11 +45,29 @@ export default function Options({ id }) {
     setAnchorEl(null);
   };
 
+  const handleOpenModalRead = () => {
+    
+    if (isFetchSuccess) {
+      dispatch(showModalDetail(true));
+      dispatch(setModalMode("read"));
+    }
+    setAnchorEl(null);
+  };
+  
   const handleOpenModalEdit = () => {
     dispatch(getStudentById(id));
     if (isFetchSuccess) {
-      dispatch(openModalEdit(true));
+      dispatch(showModalDetail(true));
+      dispatch(setModalMode("edit"));
     }
+    setAnchorEl(null);
+  };
+
+  const handleOpenModalDelete = () => {
+    // dispatch(getStudentById(id));
+    // if (isFetchSuccess) {
+    //   dispatch(showModalDetail(true));
+    // }
     setAnchorEl(null);
   };
 
@@ -70,13 +89,18 @@ export default function Options({ id }) {
           horizontal: "center",
         }}
       >
+        {/* only read */}
+        <MenuItem onClick={handleOpenModalRead} disableRipple>
+          <VisibilityIcon />
+          Ver
+        </MenuItem>
         {/* edit */}
         <MenuItem onClick={handleOpenModalEdit} disableRipple>
           <EditIcon />
           Editar
         </MenuItem>
         {/* delete */}
-        <MenuItem onClick={handleClose} disableRipple>
+        <MenuItem onClick={handleOpenModalDelet} disableRipple>
           <DeleteForeverIcon />
           Eliminar
         </MenuItem>

@@ -6,7 +6,10 @@ export const FETCH_SUCCESS = "FETCH_SUCCESS";
 export const FETCH_FAILURE = "FETCH_FAILURE";
 export const GET_ALL_STUDENTS = "GET_ALL_STUDENTS";
 export const GET_STUDENT_BY_ID = "GET_STUDENT_BY_ID";
-export const OPEN_MODAL_EDIT = "OPEN_MODAL_EDIT";
+export const UPDATE_STUDENT = "UPDATE_STUDENT";
+export const SHOW_MODAL_DETAIL = "SHOW_MODAL_DETAIL";
+export const RESET_STUDENT_INFO = "RESET_STUDENT_INFO";
+export const SET_MODAL_MODE = "SET_MODAL_MODE";
 
 export const getAllStudents = () => {
   return async (dispatch) => {
@@ -14,27 +17,26 @@ export const getAllStudents = () => {
     try {
       const response = await axios.get("https://localhost:7191/api/Student");
 
-      if (response.status >= 200 && response.status < 300) {
+      if (response?.status >= 200 && response?.status < 300) {
         dispatch({
           type: FETCH_SUCCESS,
-          payload: response.data.message,
+          payload: response?.data?.message,
         });
         return dispatch({
           type: GET_ALL_STUDENTS,
-          payload: response.data.data,
-        });
-      } else {
-        return dispatch({
-          type: FETCH_FAILURE,
-          payload:
-            response.data.message || "Error en la respuesta del servidor",
+          payload: response?.data?.data,
         });
       }
     } catch (error) {
       console.error(error);
+      let errorMessage = "Error en la conexión";
+      if (error.response) {
+        errorMessage =
+          error.response?.data?.message || "Error en la respuesta del servidor";
+      }
       return dispatch({
         type: FETCH_FAILURE,
-        payload: "Error en la conexión",
+        payload: errorMessage,
       });
     }
   };
@@ -48,37 +50,86 @@ export const getStudentById = (id) => {
         `https://localhost:7191/api/Student/${id}`
       );
 
-      if (response.status >= 200 && response.status < 300) {
+      if (response?.status >= 200 && response?.status < 300) {
         dispatch({
           type: FETCH_SUCCESS,
-          payload: response.data.message,
+          payload: response?.data?.message,
         });
         return dispatch({
           type: GET_STUDENT_BY_ID,
-          payload: response.data.data,
-        });
-      } else {
-        return dispatch({
-          type: FETCH_FAILURE,
-          payload:
-            response.data.message || "Error en la respuesta del servidor",
+          payload: response?.data?.data,
         });
       }
     } catch (error) {
       console.error(error);
+      let errorMessage = "Error en la conexión";
+      if (error.response) {
+        errorMessage =
+          error.response?.data?.message || "Error en la respuesta del servidor";
+      }
       return dispatch({
         type: FETCH_FAILURE,
-        payload: "Error en la conexión",
+        payload: errorMessage,
       });
     }
   };
 };
 
-export const openModalEdit = (action) => {
+export const updateStudent = (id, data) => {
+  return async (dispatch) => {
+    dispatch({ type: FETCH_REQUEST });
+
+    try {
+      const response = await axios.put(
+        `https://localhost:7191/api/Student/${id}`,
+        data
+      );
+      if (response?.status >= 200 && response?.status < 300) {
+        dispatch({
+          type: FETCH_SUCCESS,
+          payload: response?.data?.message,
+        });
+        return dispatch({
+          type: UPDATE_STUDENT,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      let errorMessage = "Error en la conexión";
+      if (error.response) {
+        errorMessage =
+          error.response?.data?.message || "Error en la respuesta del servidor";
+      }
+      return dispatch({
+        type: FETCH_FAILURE,
+        payload: errorMessage,
+      });
+    }
+  };
+};
+
+export const showModalDetail = (action) => {
   return (dispatch) => {
     return dispatch({
-      type: OPEN_MODAL_EDIT,
+      type: SHOW_MODAL_DETAIL,
       payload: action,
+    });
+  };
+};
+
+export const setModalMode = (mode) => {
+  return (dispatch) => {
+    return dispatch({
+      type: SET_MODAL_MODE,
+      payload: mode,
+    });
+  };
+};
+
+export const resetStudentInfo = () => {
+  return (dispatch) => {
+    return dispatch({
+      type: RESET_STUDENT_INFO,
     });
   };
 };
